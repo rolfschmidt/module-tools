@@ -311,11 +311,13 @@ EOD
     }
     elsif ( $DatabaseType eq 'Oracle' ) {
         $DSN = 'DBI:Oracle://127.0.0.1:1521/XE';
+        ## no critic
         eval '
-        use DBD::Oracle qw(:ora_session_modes);    ## no critic
+        use DBD::Oracle qw(:ora_session_modes);
         push @DBIParam, {
             ora_session_mode => ORA_SYSDBA,
         };';
+        ## use critic
 
         $ENV{ORACLE_HOME} = "/u01/app/oracle/product/11.2.0/xe";
     }
