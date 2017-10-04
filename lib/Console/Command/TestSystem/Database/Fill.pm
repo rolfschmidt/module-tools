@@ -235,6 +235,14 @@ sub Run {
     }
     else {
 
+        # deploy config
+        $CommonObject{SysConfigObject}->ConfigurationDeploy(
+            Comments    => "Deployed by Fill.pm",
+            AllSettings => 1,
+            UserID      => 1,
+            Force       => 1,
+        );
+
         # Remove the ZZZAAuto.pm from %INC to force reloading it.
         delete $INC{'Kernel/Config/Files/ZZZAAuto.pm'};
     }
