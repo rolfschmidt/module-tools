@@ -215,25 +215,43 @@ sub Run {
     # Enable Service.
     if ( $CommonObject{SysConfigObject}->can('WriteDefault') ) {
         $CommonObject{SysConfigObject}->WriteDefault();
-    }
 
-    # Define the ZZZ files.
-    my @ZZZFiles = (
-        'ZZZAAuto.pm',
-        'ZZZAuto.pm',
-    );
+        # Define the ZZZ files.
+        my @ZZZFiles = (
+            'ZZZAAuto.pm',
+            'ZZZAuto.pm',
+        );
 
-    # Reload the ZZZ files (mod_perl workaround).
-    for my $ZZZFile (@ZZZFiles) {
-        PREFIX:
-        for my $Prefix (@INC) {
-            my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
-            next PREFIX if !-f $File;
-            do $File;
-            last PREFIX;
+        # Reload the ZZZ files (mod_perl workaround).
+        for my $ZZZFile (@ZZZFiles) {
+            PREFIX:
+            for my $Prefix (@INC) {
+                my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
+                next PREFIX if !-f $File;
+                do $File;
+                last PREFIX;
+            }
         }
     }
-    if ( $CommonObject{SysConfigObject}->can('ConfigItemUpdate') ) {
+    else {
+
+        # Remove the ZZZAAuto.pm from %INC to force reloading it.
+        delete $INC{'Kernel/Config/Files/ZZZAAuto.pm'};
+    }
+
+    if ( $CommonObject{SysConfigObject}->can('SettingsSet') ) {
+        $CommonObject{SysConfigObject}->SettingsSet(
+            Settings => [
+                {
+                    Name           => 'Ticket::Service',
+                    IsValid        => 1,
+                    EffectiveValue => 1,
+                },
+            ],
+            UserID => 1,
+        );
+    }
+    else {
         $CommonObject{SysConfigObject}->ConfigItemUpdate(
             Valid => 1,
             Key   => 'Ticket::Service',
